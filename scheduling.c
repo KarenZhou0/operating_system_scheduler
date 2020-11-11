@@ -116,7 +116,8 @@ void algo_0 (int ** data, int num_process, char* op_file) {
     int start_time[num_process];
     int end_time[num_process];
     int process_state[num_process]; // READY: 1,   RUNNING: 2,   BLOCKED: 3,   RESTARTING: 4,   ENDED: 5
-    for (int i=0; i<num_process; i++){
+    int i = 0;
+    for (i=0; i<num_process; i++){
         start_time[i] = INT_MAX;
         end_time[i] = INT_MAX;
         process_state[i] = 0;
@@ -124,7 +125,8 @@ void algo_0 (int ** data, int num_process, char* op_file) {
 
     while (1){
         // CHECK FOR READY AND ENDED STATE UPDATE
-        for (int process_id=0; process_id<num_process; process_id++){
+        int process_id = 0;
+        for (process_id=0; process_id<num_process; process_id++){
             // if just starting or restarting after being blocked
             if (data[process_id][3] == time || (process_state[process_id] == 3 && time == end_time[process_id] + data[process_id][2])){
                 enQueue(ready_queue, process_id);
@@ -163,7 +165,7 @@ void algo_0 (int ** data, int num_process, char* op_file) {
         strcat(output_str, " ");
         ifputs = 0;
         ifidle = 1;
-        for (int process_id=0; process_id<num_process; process_id++){
+        for (process_id=0; process_id<num_process; process_id++){
             sprintf(pstate, "%d", data[process_id][0]);
             if (process_state[process_id] == 1) {
                 ifputs = 1;
@@ -198,7 +200,7 @@ void algo_0 (int ** data, int num_process, char* op_file) {
             sprintf(str_utilization, "%.2f", utilization);
             fputs("CPU utilization: ", output_file);
             fputs(str_utilization, output_file);
-            for (int process_id=0; process_id<num_process; process_id++){
+            for (process_id=0; process_id<num_process; process_id++){
                 int turnaround = end_time[process_id] - data[process_id][3];
                 char str_turnaround[100];
                 sprintf(str_turnaround, "%d", turnaround);
@@ -252,7 +254,8 @@ void algo_1 (int ** data, int num_process, char* op_file) {
     int end_time[num_process];
     int cumulative_running_time[num_process];
     int process_state[num_process]; // READY: 1,   RUNNING: 2,   BLOCKED: 3,   RESTARTING: 4,   ENDED: 5
-    for (int i=0; i<num_process; i++){
+    int i=0;
+    for (i=0; i<num_process; i++){
         start_time[i] = INT_MAX;
         end_time[i] = INT_MAX;
         cumulative_running_time[i] = 0;
@@ -261,7 +264,8 @@ void algo_1 (int ** data, int num_process, char* op_file) {
 
     while (1){
         // CHECK FOR READY AND ENDED STATE UPDATE
-        for (int process_id=0; process_id<num_process; process_id++){
+        int process_id = 0;
+        for (process_id=0; process_id<num_process; process_id++){
             // if just starting or restarting after being blocked
             if (data[process_id][3] == time || (process_state[process_id] == 3 && time == end_time[process_id] + data[process_id][2])){
                 enQueue(ready_queue, process_id);
@@ -275,7 +279,7 @@ void algo_1 (int ** data, int num_process, char* op_file) {
 
         // CHECK FOR BLOCKING STATE UPDATE  
         if (ready_queue->front != NULL){
-            int process_id = ready_queue->front->key;
+            process_id = ready_queue->front->key;
             int block_moment = start_time[process_id] + ceil(data[process_id][1]*0.5) - cumulative_running_time[process_id];
             if (time == block_moment){
                 process_state[process_id] = 3; // BLOCKING
@@ -287,7 +291,7 @@ void algo_1 (int ** data, int num_process, char* op_file) {
 
         // CHECK IF CURRENTLY RUNNING PROCESS HAS BEEN RUNNING or RERUNNING FOR 2 CYCLES
         if (ready_queue->front != NULL && (process_state[ready_queue->front->key] == 2 || process_state[ready_queue->front->key] == 4)){ // still have at least one process running
-            int process_id = ready_queue->front->key;
+            process_id = ready_queue->front->key;
             if (time - start_time[process_id] == 2){
                 process_state[process_id] = 1; // READY
                 deQueue(ready_queue);
@@ -298,7 +302,7 @@ void algo_1 (int ** data, int num_process, char* op_file) {
 
         // CHECK FOR RUNNING OR RESTARTING STATE UPDATE
         if (ready_queue->front != NULL && process_state[ready_queue->front->key] == 1) { // still have at least one process ready
-            int process_id = ready_queue->front->key;
+            process_id = ready_queue->front->key;
             start_time[process_id] = time;
             if (end_time[process_id] == INT_MAX) { // just starting
                 process_state[process_id] = 2; // RUNNING
@@ -312,7 +316,7 @@ void algo_1 (int ** data, int num_process, char* op_file) {
         strcat(output_str, " ");
         ifputs = 0;
         ifidle = 1;
-        for (int process_id=0; process_id<num_process; process_id++){
+        for (process_id=0; process_id<num_process; process_id++){
             sprintf(pstate, "%d", data[process_id][0]);
             if (process_state[process_id] == 1) {
                 ifputs = 1;
@@ -347,7 +351,7 @@ void algo_1 (int ** data, int num_process, char* op_file) {
             sprintf(str_utilization, "%.2f", utilization);
             fputs("CPU utilization: ", output_file);
             fputs(str_utilization, output_file);
-            for (int process_id=0; process_id<num_process; process_id++){
+            for (process_id=0; process_id<num_process; process_id++){
                 int turnaround = end_time[process_id] - data[process_id][3];
                 char str_turnaround[100];
                 sprintf(str_turnaround, "%d", turnaround);
@@ -400,7 +404,8 @@ void algo_2 (int ** data, int num_process, char* op_file) {
     int remaining_time[num_process];
     int running_process_id = INT_MAX;
     int process_state[num_process]; // READY: 1,   RUNNING: 2,   BLOCKED: 3,   RESTARTING: 4,   ENDED: 5
-    for (int i=0; i<num_process; i++){
+    int i=0;
+    for (i=0; i<num_process; i++){
         end_time[i] = INT_MAX;
         remaining_time[i] = INT_MAX;
         process_state[i] = 0;
@@ -408,7 +413,8 @@ void algo_2 (int ** data, int num_process, char* op_file) {
 
     while (1){
         // CHECK FOR READY AND ENDED STATE UPDATE
-        for (int process_id=0; process_id<num_process; process_id++){
+        int process_id=0;
+        for (process_id=0; process_id<num_process; process_id++){
             // if just starting or restarting after being blocked
             if (data[process_id][3] == time || (process_state[process_id] == 3 && remaining_time[process_id] == ceil(data[process_id][1]*0.5))){
                 // add to priority queue, with value of remaining time
@@ -437,7 +443,7 @@ void algo_2 (int ** data, int num_process, char* op_file) {
 
         // CHECK FOR ALL REMAINING CPU TIME 
         int min_remaining_time = INT_MAX;
-        for (int process_id=0; process_id<num_process; process_id++){
+        for (process_id=0; process_id<num_process; process_id++){
             if (process_state[process_id] == 1 || process_state[process_id] == 2 || process_state[process_id] == 4) { // ready or running or restarting state
                 int remaining_cpu = remaining_time[process_id];
                 if (process_state[process_id] == 1 || process_state[process_id] == 2){
@@ -458,7 +464,7 @@ void algo_2 (int ** data, int num_process, char* op_file) {
         }
 
         // UPDATE EACH PROCESS PROCESS'S REMAINING TIME
-        for (int process_id=0; process_id<num_process; process_id++){
+        for (process_id=0; process_id<num_process; process_id++){
             if (process_state[process_id] == 2 || process_state[process_id] == 3 || process_state[process_id] == 4) {
             // we only update remaining time when the process is running, blocked or restarting 
                 remaining_time[process_id] -= 1;
@@ -470,7 +476,7 @@ void algo_2 (int ** data, int num_process, char* op_file) {
         strcat(output_str, " ");
         ifputs = 0;
         ifidle = 1;
-        for (int process_id=0; process_id<num_process; process_id++){
+        for (process_id=0; process_id<num_process; process_id++){
             sprintf(pstate, "%d", data[process_id][0]);
             if (process_state[process_id] == 1) {
                 ifputs = 1;
@@ -505,7 +511,7 @@ void algo_2 (int ** data, int num_process, char* op_file) {
             sprintf(str_utilization, "%.2f", utilization);
             fputs("CPU utilization: ", output_file);
             fputs(str_utilization, output_file);
-            for (int process_id=0; process_id<num_process; process_id++){
+            for (process_id=0; process_id<num_process; process_id++){
                 int turnaround = end_time[process_id] - data[process_id][3];
                 char str_turnaround[100];
                 sprintf(str_turnaround, "%d", turnaround);
@@ -547,7 +553,8 @@ int main(int argc, char ** argv) {
     FILE *fr = fopen(argv[1], "r");
     fscanf(fr, "%d", &num_process);
     int **data = (int **)malloc(num_process * 4 * sizeof(int));
-    for (int j=0;j<num_process;j++){
+    int j = 0;
+    for (j=0;j<num_process;j++){
         data[j] = (int *)malloc(4 * sizeof(int));
     }
     while (i < num_process) {
