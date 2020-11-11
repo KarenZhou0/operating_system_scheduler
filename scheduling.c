@@ -5,7 +5,6 @@
 #include<sys/wait.h>
 #include <string.h>
 #include <stdlib.h> 
-#include <math.h>
 #include <limits.h>
 
 //........................................................
@@ -82,6 +81,15 @@ void deQueue(struct Queue* q)
     free(temp); 
 } 
 
+///////////CEILING FUNCTION////////////
+
+int ceiling_half(int num){
+    if (num % 2 == 0) {
+        return num/2;
+    }
+    return (num+1)/2; 
+}
+
 //..................................................
 //............lll.........................000000....
 //............lll........................00000000...
@@ -131,7 +139,7 @@ void algo_0 (int ** data, int num_process, char* op_file) {
             if (data[process_id][3] == time || (process_state[process_id] == 3 && time == end_time[process_id] + data[process_id][2])){
                 enQueue(ready_queue, process_id);
                 process_state[process_id] = 1; // READY
-            } else if (process_state[process_id] == 4 && time == start_time[process_id] + ceil(data[process_id][1]*0.5)) {
+            } else if (process_state[process_id] == 4 && time == start_time[process_id] + ceiling_half(data[process_id][1])) {
                 process_state[process_id] = 5; // ENDED
                 end_time[process_id] = time;
                 deQueue(ready_queue);
@@ -141,7 +149,7 @@ void algo_0 (int ** data, int num_process, char* op_file) {
         // CHECK FOR BLOCKING STATE UPDATE  
         if (ready_queue->front != NULL){
             int process_id = ready_queue->front->key;
-            int block_moment = start_time[process_id] + ceil(data[process_id][1]*0.5);
+            int block_moment = start_time[process_id] + ceiling_half(data[process_id][1]);
             if (time == block_moment){
                 process_state[process_id] = 3; // BLOCKING
                 end_time[process_id] = time;
@@ -270,7 +278,7 @@ void algo_1 (int ** data, int num_process, char* op_file) {
             if (data[process_id][3] == time || (process_state[process_id] == 3 && time == end_time[process_id] + data[process_id][2])){
                 enQueue(ready_queue, process_id);
                 process_state[process_id] = 1; // READY
-            } else if (process_state[process_id] == 4 && time == start_time[process_id] + ceil(data[process_id][1]*0.5) - cumulative_running_time[process_id]) {
+            } else if (process_state[process_id] == 4 && time == start_time[process_id] + ceiling_half(data[process_id][1]) - cumulative_running_time[process_id]) {
                 process_state[process_id] = 5; // ENDED
                 end_time[process_id] = time;
                 deQueue(ready_queue);
@@ -280,7 +288,7 @@ void algo_1 (int ** data, int num_process, char* op_file) {
         // CHECK FOR BLOCKING STATE UPDATE  
         if (ready_queue->front != NULL){
             process_id = ready_queue->front->key;
-            int block_moment = start_time[process_id] + ceil(data[process_id][1]*0.5) - cumulative_running_time[process_id];
+            int block_moment = start_time[process_id] + ceiling_half(data[process_id][1]) - cumulative_running_time[process_id];
             if (time == block_moment){
                 process_state[process_id] = 3; // BLOCKING
                 end_time[process_id] = time; // update end time only when blocked, not when being switched by another process
@@ -416,7 +424,7 @@ void algo_2 (int ** data, int num_process, char* op_file) {
         int process_id=0;
         for (process_id=0; process_id<num_process; process_id++){
             // if just starting or restarting after being blocked
-            if (data[process_id][3] == time || (process_state[process_id] == 3 && remaining_time[process_id] == ceil(data[process_id][1]*0.5))){
+            if (data[process_id][3] == time || (process_state[process_id] == 3 && remaining_time[process_id] == ceiling_half(data[process_id][1]))){
                 // add to priority queue, with value of remaining time
                 process_state[process_id] = 1; // READY
                 if (data[process_id][3] == time) {
@@ -432,7 +440,7 @@ void algo_2 (int ** data, int num_process, char* op_file) {
 
         // CHECK FOR BLOCKING STATE UPDATE  
         if (running_process_id != INT_MAX){
-            if (ceil(data[running_process_id][1]*0.5) + data[running_process_id][2] == remaining_time[running_process_id]){
+            if (ceiling_half(data[running_process_id][1]) + data[running_process_id][2] == remaining_time[running_process_id]){
                 process_state[running_process_id] = 3; // BLOCKING
                 running_process_id = INT_MAX;
             } else {
